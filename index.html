@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study - Main Task</title>
+    <title>Çalışma - Ana Görev</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,7 +34,7 @@
             font-weight: bold;
             transition: background-color 0.3s;
         }
-        #redirectButton:hover {
+        #redirectButton:hover:not(:disabled) {
             background-color: #3367d6;
         }
         #redirectButton:disabled {
@@ -44,7 +44,6 @@
         #statusMessage {
             margin-top: 20px;
             font-weight: bold;
-            color: #d23f00;
             min-height: 24px;
         }
         .code-instruction {
@@ -55,61 +54,219 @@
             margin-top: 40px;
             font-size: 0.95em;
         }
+        .quota-box {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            border: 1px solid #eee;
+            font-size: 0.9em;
+            text-align: left;
+            display: none; /* Varsayılan olarak gizli */
+        }
+        .quota-item {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .quota-ok { background-color: #e7f7e7; }
+        .quota-full { background-color: #ffeaea; color: #c33; }
+        .warning-message {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Main Experiment Task</h1>
-    <p><strong>Thank you for completing the initial survey.</strong></p>
-    <p>You will now be randomly assigned to the main part of the study.</p>
+    <h1>Ana Deney Görevi</h1>
+    <p><strong>İlk anketi tamamladığınız için teşekkür ederiz.</strong></p>
+    <p>Şimdi çalışmanın son bölümüne yönlendirileceksiniz.</p>
 
     <div class="info-box">
-        <p>🔹 <strong>Important:</strong> Click the button only <strong>once</strong>.</p>
-        <p>🔹 The system will randomly select your task.</p>
-        <p>🔹 The new page will open automatically.</p>
+        <p>🔹 <strong>Önemli:</strong> Butona lütfen sadece <strong>bir kez</strong> tıklayın.</p>
+        <p>🔹 Sistem, her grupta eşit sayıda katılımcı olmasını sağlayacak şekilde sizi bir göreve atayacaktır.</p>
+        <p>🔹 Yeni sayfa otomatik olarak açılacaktır.</p>
     </div>
 
-    <button id="redirectButton" onclick="redirectToRandomForm()">
-        Start the Main Task
+    <!-- Kota doldu uyarısı -->
+    <div class="warning-message" id="quotaWarning">
+        <strong>⛔ Çalışma Tamamlandı:</strong> Tüm deney grupları için gerekli katılımcı sayısına ulaşılmıştır. İlginiz için çok teşekkür ederiz.
+    </div>
+
+    <button id="redirectButton" onclick="assignToCondition()">
+        Ana Göreve Başla
     </button>
 
     <p id="statusMessage"></p>
 
-    <!-- CRITICAL: Participant Code Reminder -->
+    <!-- Sistem Durumu Görseli (Sadece araştırmacı için) -->
+    <div class="quota-box" id="quotaDisplay">
+        <p><strong>Sistem Durumu (Her grup maksimum 40 katılımcı):</strong></p>
+        <div id="quotaList"></div>
+        <p style="font-size:0.8em; margin-top:10px; color:#666;">
+            <em>Bu bölüm sadece araştırmacılar içindir. Katılımcılar göremez.</em>
+        </p>
+    </div>
+
+    <!-- Katılımcı Kodu Hatırlatması -->
     <div class="code-instruction">
-        <p>💡 <strong>Remember your unique participant code:</strong></p>
-        <p>You created a code in the first survey (like <code>15MSK</code>).<br>
-        You <strong>must enter the exact same code</strong> on the next page to link your responses.</p>
+        <p>💡 <strong>Katılımcı kodunuzu hatırlayın:</strong></p>
+        <p>İlk ankette bir kod oluşturdunuz (Ör: <code>15MSK</code>).<br>
+        Cevaplarınızı eşleştirebilmemiz için <strong>bir sonraki sayfada aynı kodu tekrar girin. </strong></p>
     </div>
 
     <script>
-        // === REPLACE THESE 4 LINKS WITH YOUR ACTUAL FORM LINKS ===
-        const FORM_URLS = [
-            'https://forms.gle/PzkW6p8UHQNGX9nt5',
-            'https://forms.gle/CfnQHUhzPmxkeF7q6',
-            'https://forms.gle/zBhTfUjpPyNmEzdV7',
-            'https://forms.gle/PQWNiozw4RnDJ9BF9',
+        // === SİZİN 4 FORM LİNKİNİZ ===
+        const CONDITIONS = [
+            { 
+                name: "Koşul 1", 
+                url: 'https://forms.gle/PzkW6p8UHQNGX9nt5',
+                quota: 40,
+                assigned: 0
+            },
+            { 
+                name: "Koşul 2", 
+                url: 'https://forms.gle/CfnQHUhzPmxkeF7q6',
+                quota: 40,
+                assigned: 0
+            },
+            { 
+                name: "Koşul 3", 
+                url: 'https://forms.gle/zBhTfUjpPyNmEzdV7',
+                quota: 40,
+                assigned: 0
+            },
+            { 
+                name: "Koşul 4", 
+                url: 'https://forms.gle/PQWNiozw4RnDJ9BF9',
+                quota: 40,
+                assigned: 0
+            }
         ];
-        // ==========================================================
 
-        function redirectToRandomForm() {
+        // Tarayıcı belleğinde kotayı yükle
+        function loadQuotaData() {
+            const saved = localStorage.getItem('studyQuotaData_160');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                CONDITIONS.forEach((cond, index) => {
+                    if(savedData[index]) {
+                        cond.assigned = savedData[index].assigned;
+                    }
+                });
+            }
+            updateQuotaDisplay();
+            checkAllQuotasFull();
+        }
+
+        // Kotayı tarayıcı belleğine kaydet
+        function saveQuotaData() {
+            const dataToSave = CONDITIONS.map(cond => ({
+                name: cond.name,
+                assigned: cond.assigned,
+                quota: cond.quota
+            }));
+            localStorage.setItem('studyQuotaData_160', JSON.stringify(dataToSave));
+            updateQuotaDisplay();
+            checkAllQuotasFull();
+        }
+
+        // Kotayı ekranda göster
+        function updateQuotaDisplay() {
+            const quotaList = document.getElementById('quotaList');
+            if (!quotaList) return;
+            
+            let html = '';
+            CONDITIONS.forEach(cond => {
+                const isFull = cond.assigned >= cond.quota;
+                const statusClass = isFull ? 'quota-full' : 'quota-ok';
+                html += `<div class="quota-item ${statusClass}">
+                    ${cond.name}: <strong>${cond.assigned}/${cond.quota}</strong>
+                    ${isFull ? ' (DOLU)' : ''}
+                </div>`;
+            });
+            quotaList.innerHTML = html;
+        }
+
+        // Tüm kotalar doldu mu kontrol et
+        function checkAllQuotasFull() {
+            const allFull = CONDITIONS.every(cond => cond.assigned >= cond.quota);
+            const warningDiv = document.getElementById('quotaWarning');
+            const button = document.getElementById('redirectButton');
+            
+            if (allFull) {
+                warningDiv.style.display = 'block';
+                button.disabled = true;
+                button.textContent = 'Çalışma Tamamlandı';
+                document.getElementById('statusMessage').textContent = '';
+            } else {
+                warningDiv.style.display = 'none';
+            }
+        }
+
+        // Ana atama fonksiyonu
+        function assignToCondition() {
             const button = document.getElementById('redirectButton');
             const status = document.getElementById('statusMessage');
 
-            // Disable the button immediately to prevent double-clicks
+            // Butonu devre dışı bırak
             button.disabled = true;
-            button.textContent = 'Redirecting...';
-            status.textContent = 'Please wait, assigning your task...';
+            button.textContent = 'Atama Yapılıyor...';
+            status.textContent = 'Lütfen bekleyin, uygun bir görev aranıyor...';
+            status.style.color = '#d23f00';
 
-            // Simple random selection
-            const randomIndex = Math.floor(Math.random() * FORM_URLS.length);
-            const selectedFormUrl = FORM_URLS[randomIndex];
-
-            // Brief delay so the user sees the message, then redirect
+            // 1. Dolu olmayan koşulları filtrele
+            const availableConditions = CONDITIONS.filter(cond => cond.assigned < cond.quota);
+            
+            if (availableConditions.length === 0) {
+                status.textContent = 'Üzgünüz, tüm gruplar dolmuştur. Katılımınız için teşekkür ederiz.';
+                status.style.color = '#c33';
+                return;
+            }
+            
+            // 2. En az katılımcı atanmış koşulu bul
+            let minAssigned = Math.min(...availableConditions.map(c => c.assigned));
+            let candidates = availableConditions.filter(c => c.assigned === minAssigned);
+            
+            // 3. Adaylar arasından rastgele seç
+            const selectedCondition = candidates[Math.floor(Math.random() * candidates.length)];
+            
+            // 4. Sayacı artır ve kaydet
+            selectedCondition.assigned++;
+            saveQuotaData();
+            
+            // 5. Katılımcıya bilgi ver ve yönlendir
+            status.textContent = `Göreviniz atandı. Yönlendiriliyorsunuz...`;
+            status.style.color = '#2e7d32';
+            
             setTimeout(() => {
-                window.location.href = selectedFormUrl;
-            }, 800); // 0.8 second delay
+                window.location.href = selectedCondition.url;
+            }, 1200);
         }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuotaData();
+            
+            // Araştırmacı için: URL'de ?admin varsa kotayı göster
+            if(window.location.search.includes('?admin')) {
+                document.getElementById('quotaDisplay').style.display = 'block';
+            }
+            
+            // Test modu: URL'de ?reset varsa kotayı sıfırla
+            if(window.location.search.includes('?reset')) {
+                localStorage.removeItem('studyQuotaData_160');
+                loadQuotaData();
+                alert('Kota verileri sıfırlandı!');
+                window.location.search = '';
+            }
+        });
     </script>
 
 </body>
