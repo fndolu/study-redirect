@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study - Main Task</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .info-box {
+            background-color: #f0f7ff;
+            border-left: 5px solid #4285f4;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+            border-radius: 5px;
+        }
+        #redirectButton {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 25px 0;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #redirectButton:hover {
+            background-color: #3367d6;
+        }
+        #redirectButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #statusMessage {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #d23f00;
+            min-height: 24px;
+        }
+        .code-instruction {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px dashed #ffb300;
+            margin-top: 40px;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Main Experiment Task</h1>
+    <p><strong>Thank you for completing the initial survey.</strong></p>
+    <p>You will now be randomly assigned to the main part of the study.</p>
+
+    <div class="info-box">
+        <p>🔹 <strong>Important:</strong> Click the button only <strong>once</strong>.</p>
+        <p>🔹 The system will randomly select your task.</p>
+        <p>🔹 The new page will open automatically.</p>
+    </div>
+
+    <button id="redirectButton" onclick="redirectToRandomForm()">
+        Start the Main Task
+    </button>
+
+    <p id="statusMessage"></p>
+
+    <!-- CRITICAL: Participant Code Reminder -->
+    <div class="code-instruction">
+        <p>💡 <strong>Remember your unique participant code:</strong></p>
+        <p>You created a code in the first survey (like <code>15MSK</code>).<br>
+        You <strong>must enter the exact same code</strong> on the next page to link your responses.</p>
+    </div>
+
+    <script>
+        // === REPLACE THESE 4 LINKS WITH YOUR ACTUAL FORM LINKS ===
+        const FORM_URLS = [
+            'https://forms.gle/PzkW6p8UHQNGX9nt5',
+            'https://forms.gle/CfnQHUhzPmxkeF7q6',
+            'https://forms.gle/zBhTfUjpPyNmEzdV7',
+            'https://forms.gle/PQWNiozw4RnDJ9BF9',
+        ];
+        // ==========================================================
+
+        function redirectToRandomForm() {
+            const button = document.getElementById('redirectButton');
+            const status = document.getElementById('statusMessage');
+
+            // Disable the button immediately to prevent double-clicks
+            button.disabled = true;
+            button.textContent = 'Redirecting...';
+            status.textContent = 'Please wait, assigning your task...';
+
+            // Simple random selection
+            const randomIndex = Math.floor(Math.random() * FORM_URLS.length);
+            const selectedFormUrl = FORM_URLS[randomIndex];
+
+            // Brief delay so the user sees the message, then redirect
+            setTimeout(() => {
+                window.location.href = selectedFormUrl;
+            }, 800); // 0.8 second delay
+        }
+    </script>
+
+</body>
+</html>
